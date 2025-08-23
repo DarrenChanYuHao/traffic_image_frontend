@@ -24,5 +24,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: my-flutter-app
+          projectName: traffic-image-frontend
           directory: build/web
