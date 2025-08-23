@@ -327,6 +327,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           final LatLng cameraPos = camera['LatLng'] as LatLng;
                           return _isPointNearRoute(cameraPos, _routePoints!);
                         }).map<Marker>((camera) {
+                          // Get image from backend API
+
                           return Marker(
                             point: camera['LatLng'] as LatLng,
                             width: 40.0,
@@ -344,7 +346,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                     contentPadding: EdgeInsets.zero,
                                     content: Stack(
                                       children: [
-                                        ShowCameraImage(imageUrl: camera['image'] as String),
+                                        ShowCameraImage(
+                                          imageUrl: 'https://traffic-api.darrenchanyuhao.com/traffic-image?url=${Uri.encodeComponent(camera['image'] as String)}',
+                                        ),
                                         Positioned(
                                           top: 8,
                                           right: 8,
@@ -391,16 +395,40 @@ class _MyHomePageState extends State<MyHomePage> {
                               onPressed: () {
                                 showDialog(
                                   context: context,
-                                  builder: (context) => AlertDialog(
+                                  builder: (_) => AlertDialog(
                                     contentPadding: EdgeInsets.zero,
-                                    content: ShowCameraImage(imageUrl: camera['image'] as String),
+                                    content: Stack(
+                                      children: [
+                                        ShowCameraImage(
+                                          imageUrl: 'https://traffic-api.darrenchanyuhao.com/traffic-image?url=${Uri.encodeComponent(camera['image'] as String)}',
+                                        ),
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: GestureDetector(
+                                            onTap: () => Navigator.pop(context),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.black54,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              padding: const EdgeInsets.all(8), // very tight padding
+                                              child: const Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                                size: 16,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
                               },
                             ),
                           );
                         }).toList());
-
                       }
                     } catch (e) {
                       debugPrint('Error adding camera markers: $e');
@@ -474,35 +502,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ))
         ],
       ),
-    );
-  }
-
-  void _showCameraImage(String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Traffic Camera'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return const Center(
-                  child: Text('Failed to load image'),
-                );
-              },
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        );
-      },
     );
   }
 }

@@ -10,7 +10,8 @@ class ApiService {
     // This fetch the latitude and longitude of the cameras from
     // https://api.data.gov.sg/v1/transport/traffic-images
 
-    final url = Uri.parse('https://api.data.gov.sg/v1/transport/traffic-images');
+    final url = Uri.parse(
+        'https://api.data.gov.sg/v1/transport/traffic-images');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -19,10 +20,11 @@ class ApiService {
         // Get only the latitude and longitude of the cameras
         final cameras = data['items'][0]['cameras'];
         final cameraLocations = cameras.map((camera) {
-          return {'camera_id':camera['camera_id'],
-                  'LatLng': LatLng(camera['location']['latitude'], camera['location']['longitude']),
-                  'image': camera['image']
-                  };
+          return {'camera_id': camera['camera_id'],
+            'LatLng': LatLng(camera['location']['latitude'],
+                camera['location']['longitude']),
+            'image': camera['image']
+          };
         }).toList();
         return cameraLocations;
       } else {
