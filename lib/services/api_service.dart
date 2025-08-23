@@ -39,7 +39,7 @@ class ApiService {
 class RoutingService {
   Future<List<LatLng>> getDrivingRoute(LatLng start, LatLng end) async {
     final url = Uri.parse(
-      'https://traffic.darrenchanyuhao.com/route'
+      'https://traffic-api.darrenchanyuhao.com/route'
           '?start=${start.latitude},${start.longitude}'
           '&end=${end.latitude},${end.longitude}'
     );
@@ -67,7 +67,7 @@ class RoutingService {
 
   Future<List<Map<String, dynamic>>> getSearchLocationLatLng(String query) async {
     final url = Uri.parse(
-        'https://traffic.darrenchanyuhao.com/search?searchVal=$query');
+        'https://traffic-api.darrenchanyuhao.com/search?searchVal=$query');
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
