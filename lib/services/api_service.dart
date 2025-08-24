@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:latlong2/latlong.dart';
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
+import 'package:intl/intl.dart';
 
 class ApiService {
   Future<List<dynamic>> fetchCameraLocationData() async {
@@ -20,10 +21,13 @@ class ApiService {
         // Get only the latitude and longitude of the cameras
         final cameras = data['items'][0]['cameras'];
         final cameraLocations = cameras.map((camera) {
-          return {'camera_id': camera['camera_id'],
+          return {
+            'camera_id': camera['camera_id'],
             'LatLng': LatLng(camera['location']['latitude'],
                 camera['location']['longitude']),
-            'image': camera['image']
+            'image': camera['image'],
+            'timestamp': DateFormat('dd/MM/yyyy HH:mm:ss')
+                .format(DateTime.parse(camera['timestamp']).toLocal()),
           };
         }).toList();
         return cameraLocations;

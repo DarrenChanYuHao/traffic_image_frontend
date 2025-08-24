@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class ShowCameraImage extends StatelessWidget {
 
   final String imageUrl;
-  const ShowCameraImage({super.key, required this.imageUrl});
+  final String timestamp;
+  const ShowCameraImage({super.key, required this.imageUrl, required this.timestamp});
 
   @override
   Widget build(BuildContext context) {
@@ -15,39 +16,65 @@ class ShowCameraImage extends StatelessWidget {
       margin: const EdgeInsets.all(0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.fill,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return SizedBox(
-              height: 200,
-              child: Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          (loadingProgress.expectedTotalBytes ?? 1)
-                      : null,
-                ),
+        child: Stack(
+            children: [
+              Image.network(
+                imageUrl,
+                fit: BoxFit.fill,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                          SizedBox(height: 8),
+                          Text('Failed to load image', style: TextStyle(color: Colors.grey)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return SizedBox(
-              height: 200,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                    SizedBox(height: 8),
-                    Text('Failed to load image', style: TextStyle(color: Colors.grey)),
-                  ],
+              Positioned(
+                  bottom: 0,
+                  right: 0, child:
+                Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      timestamp,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
                 ),
-              ),
-            );
-          },
+
+            ],
+          ),
         ),
-      ),
     );
   }}

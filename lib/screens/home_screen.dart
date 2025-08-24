@@ -178,6 +178,115 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _showCameraDialog(BuildContext context, List<dynamic> camerasOnRoute, int initialIndex, String timestamp) {
+    int currentIndex = initialIndex;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final camera = camerasOnRoute[currentIndex];
+            return AlertDialog(
+              contentPadding: EdgeInsets.zero,
+              content: Stack(
+                children: [
+                  ShowCameraImage(
+                    imageUrl: 'https://traffic-api.darrenchanyuhao.com/traffic-image?url=${Uri.encodeComponent(camera['image'] as String)}',
+                    timestamp: timestamp,
+                  ),
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onHorizontalDragEnd: (details) {
+                        // Swipe left → go forward
+                        if (details.primaryVelocity! < 0) {
+                          if (currentIndex < camerasOnRoute.length - 1) {
+                            setState(() {
+                              currentIndex++;
+                            });
+                          }
+                        }
+                        // Swipe right → go back
+                        else if (details.primaryVelocity! > 0) {
+                          if (currentIndex > 0) {
+                            setState(() {
+                              currentIndex--;
+                            });
+                          }
+                        }
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(Icons.close, color: Colors.white, size: 16),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 8,
+                    left: 8,
+                    right: 8,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          color: Colors.white60,
+                          onPressed: currentIndex > 0
+                              ? () => setState(() => currentIndex--)
+                              : null,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_forward),
+                          color: Colors.white60,
+                          onPressed: currentIndex < camerasOnRoute.length - 1
+                              ? () => setState(() => currentIndex++)
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  List<dynamic> _sortCamerasByRouteOrder(List<dynamic> cameras, List<LatLng> route) {
+    int _nearestRouteIndex(LatLng cameraPos) {
+      double minDist = double.infinity;
+      int minIdx = 0;
+      for (int i = 0; i < route.length; i++) {
+        final dist = (cameraPos.latitude - route[i].latitude).abs() +
+            (cameraPos.longitude - route[i].longitude).abs();
+        if (dist < minDist) {
+          minDist = dist;
+          minIdx = i;
+        }
+      }
+      return minIdx;
+    }
+
+    cameras.sort((a, b) {
+      final idxA = _nearestRouteIndex(a['LatLng'] as LatLng);
+      final idxB = _nearestRouteIndex(b['LatLng'] as LatLng);
+      return idxA.compareTo(idxB);
+    });
+    return cameras;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -339,41 +448,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                 color: Colors.white,
                                 size: 20,
                               ),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    contentPadding: EdgeInsets.zero,
-                                    content: Stack(
-                                      children: [
-                                        ShowCameraImage(
-                                          imageUrl: 'https://traffic-api.darrenchanyuhao.com/traffic-image?url=${Uri.encodeComponent(camera['image'] as String)}',
-                                        ),
-                                        Positioned(
-                                          top: 8,
-                                          right: 8,
-                                          child: GestureDetector(
-                                            onTap: () => Navigator.pop(context),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Colors.black54,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              padding: const EdgeInsets.all(8), // very tight padding
-                                              child: const Icon(
-                                                Icons.close,
-                                                color: Colors.white,
-                                                size: 16,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
+                                onPressed: () {
+                                  var camerasOnRoute = snapshot.data!
+                                      .where((camera) => _isPointNearRoute(camera['LatLng'] as LatLng, _routePoints!))
+                                      .toList();
+                                  camerasOnRoute = _sortCamerasByRouteOrder(camerasOnRoute, _routePoints!);
+                                  final index = camerasOnRoute.indexOf(camera);
+                                  final timestamp = camera['timestamp'] as String;
+                                  _showCameraDialog(context, camerasOnRoute, index, timestamp,);
+                                }
+                                ),
                           );
                         }).toList());
 
@@ -401,6 +485,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       children: [
                                         ShowCameraImage(
                                           imageUrl: 'https://traffic-api.darrenchanyuhao.com/traffic-image?url=${Uri.encodeComponent(camera['image'] as String)}',
+                                          timestamp: camera['timestamp'] as String,
                                         ),
                                         Positioned(
                                           top: 8,
