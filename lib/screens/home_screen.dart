@@ -178,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _showCameraDialog(BuildContext context, List<dynamic> camerasOnRoute, int initialIndex, String timestamp) {
+  void _showCameraDialog(BuildContext context, List<dynamic> camerasOnRoute, int initialIndex) {
     int currentIndex = initialIndex;
     showDialog(
       context: context,
@@ -192,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   ShowCameraImage(
                     imageUrl: 'https://traffic-api.darrenchanyuhao.com/traffic-image?url=${Uri.encodeComponent(camera['image'] as String)}',
-                    timestamp: timestamp,
+                    timestamp: camera['timestamp'] as String,
                   ),
                   Positioned.fill(
                     child: GestureDetector(
@@ -437,7 +437,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           return _isPointNearRoute(cameraPos, _routePoints!);
                         }).map<Marker>((camera) {
                           // Get image from backend API
-
                           return Marker(
                             point: camera['LatLng'] as LatLng,
                             width: 40.0,
@@ -454,14 +453,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                       .toList();
                                   camerasOnRoute = _sortCamerasByRouteOrder(camerasOnRoute, _routePoints!);
                                   final index = camerasOnRoute.indexOf(camera);
-                                  final timestamp = camera['timestamp'] as String;
-                                  _showCameraDialog(context, camerasOnRoute, index, timestamp,);
+                                  _showCameraDialog(context, camerasOnRoute, index,);
                                 }
                                 ),
                           );
                         }).toList());
-
-
                       } else {
                         debugPrint('No route, showing all cameras');
                         // If no route, show all cameras
@@ -519,7 +515,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       debugPrint('Error adding camera markers: $e');
                     }
                   }
-
                   return MarkerLayer(markers: markers);
                 },
               ),
