@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Traffic Image App',
+      title: 'Traffic Visualiser',
       theme: ThemeData(
         colorScheme: ColorScheme(
           brightness: Brightness.light,
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
           onError: Colors.white,
         ),
       ),
-      home: const MyHomePage(title: 'Traffic Image App Home Page'),
+      home: const MyHomePage(title: 'Traffic Visualiser'),
     );
   }
 }

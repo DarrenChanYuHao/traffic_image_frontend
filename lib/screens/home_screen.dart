@@ -292,7 +292,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(widget.title),
+        title: Row(
+          children: [
+            SizedBox(
+                width: 30,
+                height: 30,
+                child: Image.asset('assets/icon/traffic_visualiser_android.png',)),
+            SizedBox(width: 8,),
+            Text(widget.title),
+          ],
+        ),
       ),
       body: _errorMessage != null
           ? Center(
