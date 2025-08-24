@@ -1,6 +1,6 @@
 {
-    "name": "traffic_app",
-    "short_name": "traffic_app",
+    "name": "Traffic Visualiser",
+    "short_name": "Traffic Visualiser",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#hexcode",
