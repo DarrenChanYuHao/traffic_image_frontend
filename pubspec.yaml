@@ -38,7 +38,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.4
-  launcher_name: ^1.0.2
+  names_launcher: ^0.0.2
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -58,8 +58,21 @@ flutter_launcher_icons:
     generate: true
     image_path: "assets/icon/traffic_visualiser.png"
 
-launcher_name:
-  default: "Traffic Visualiser"
+names_launcher:
+  name: "Traffic Visualiser"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
+    windows:
+      enable: true
+    macos:
+      enable: true
+    web:
+      enable: true
+    linux:
+      enable: true
 
 flutter:
   uses-material-design: true
